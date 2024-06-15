@@ -1,11 +1,35 @@
 class Book:
     def __init__(self, title, author, publication_year, genre):
+
+        """
+        Constructor method for the Book class.
+
+        Parameters:
+        title (str): The title of the book.
+        author (str): The author of the book.
+        publication_year (int): The year the book was published.
+        genre (str): The genre of the book.
+
+        Initializes a new instance of the Book class with the given details.
+        """
         self.title = title
         self.author = author
         self.publication_year = publication_year
         self.genre = genre
 
     def update(self, title=None, author=None, publication_year=None, genre=None):
+        """
+        Updates the attributes of the Book instance.
+
+        Parameters:
+        title (str, optional): The new title of the book. Defaults to None.
+        author (str, optional): The new author of the book. Defaults to None.
+        publication_year (int, optional): The new publication year of the book. Defaults to None.
+        genre (str, optional): The new genre of the book. Defaults to None.
+
+        Updates the attributes of the Book instance with the new values provided.
+        If a parameter is not provided, the corresponding attribute remains unchanged.
+        """
         if title:
             self.title = title
         if author:
@@ -15,7 +39,19 @@ class Book:
         if genre:
             self.genre = genre
 
+    # This function creates and returns a dictionary with keys corresponding to the attributes of the Book instance
+    # (title, author, publication_year, and genre) and values corresponding to the current values of these attributes.
     def to_dict(self):
+        """
+        Converts the Book instance into a dictionary format.
+
+        Returns: A dictionary that its keys being the attributes of the Book instance
+                (title, author, publication_year, genre), and its values are the
+                current values of these attributes.
+
+        This function is Useful for tasks like saving the book information to a file or displaying it in
+        a user-friendly format.
+        """
         return {
             "title": self.title,
             "author": self.author,
