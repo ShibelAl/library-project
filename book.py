@@ -1,6 +1,10 @@
+
+# ---------------------------
+# This class defines the essential characteristics and actions
+# of a book in the library management system.
+# ---------------------------
 class Book:
     def __init__(self, title, author, publication_year, genre):
-
         """
         Constructor method for the Book class.
 
@@ -12,6 +16,7 @@ class Book:
 
         Initializes a new instance of the Book class with the given details.
         """
+
         self.title = title
         self.author = author
         self.publication_year = publication_year
@@ -30,6 +35,7 @@ class Book:
         Updates the attributes of the Book instance with the new values provided.
         If a parameter is not provided, the corresponding attribute remains unchanged.
         """
+
         if title:
             self.title = title
         if author:
@@ -39,19 +45,19 @@ class Book:
         if genre:
             self.genre = genre
 
-    # This function creates and returns a dictionary with keys corresponding to the attributes of the Book instance
-    # (title, author, publication_year, and genre) and values corresponding to the current values of these attributes.
     def to_dict(self):
         """
         Converts the Book instance into a dictionary format.
 
-        Returns: A dictionary that its keys being the attributes of the Book instance
-                (title, author, publication_year, genre), and its values are the
-                current values of these attributes.
+        Returns:
+        A dictionary that its keys being the attributes of the Book instance
+        (title, author, publication_year, genre), and its values are the
+        current values of these attributes.
 
         This function is Useful for tasks like saving the book information to a file or displaying it in
         a user-friendly format.
         """
+
         return {
             "title": self.title,
             "author": self.author,
