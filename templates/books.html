@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Books</title>
+</head>
+<body>
+    <h1>Books in Your Library</h1>
+    <ul>
+        {% for book in books %}
+        <li>
+            {{ book.title }} by {{ book.author }} ({{ book.publication_year }}), Genre: {{ book.genre }}
+            <span> <!-- to group the "Edit" and "Delete" links together for each book. for future css. -->
+                <a href="/edit/{{ book.title }}">Edit</a>
+                <a href="/delete/{{ book.title }}">Delete</a>
+            </span>
+        </li>
+        {% endfor %}
+    </ul>
+    <h2>Add a New Book</h2>
+    <form action="/books" method="post">
+        Title: <input type="text" name="title"><br>
+        Author: <input type="text" name="author"><br>
+        Year: <input type="text" name="year"><br>
+        Genre: <input type="text" name="genre"><br>
+        <br><input type="submit" value="Add Book">
+    </form>
+    <footer>
+        <br><a href="/">Back to Home</a>
+    </footer>
+
+</body>
+</html>
