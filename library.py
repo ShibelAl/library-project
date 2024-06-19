@@ -33,14 +33,14 @@ class Library:
 
     def list_books(self, author=None, genre=None, publication_year=None):
         """
-        Lists all books in the library or filters them by author and/or genre.
+        Lists all books in the library or filters them by author and/or genre and/or publication year.
 
         Parameters:
         author (str, optional): Filter books by the specified author (default is None).
         genre (str, optional): Filter books by the specified genre (default is None).
         publication_year (int, optional): Filter books by the publication_year (default is None).
 
-        Returns:
+        :returns:
         list: A list of Book objects that match the specified filter criteria.
         """
 
@@ -61,7 +61,7 @@ class Library:
         title (str): The title of the book to be edited.
         new_details (dict): A dictionary containing the updated details of the book.
 
-        Returns:
+        :returns:
         bool: True if the book was found and updated successfully, False otherwise.
         """
 
