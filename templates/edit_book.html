@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Book</title>
+</head>
+<body>
+    <h1>Edit Book: {{ book.title }}</h1>
+    <form action="/edit/{{ book.title }}" method="post">
+        New Title: <input type="text" name="new_title" value="{{ book.title }}"><br>
+        Author: <input type="text" name="author" value="{{ book.author }}"><br>
+        Year: <input type="text" name="year" value="{{ book.publication_year }}"><br>
+        Genre: <input type="text" name="genre" value="{{ book.genre }}"><br>
+        <br><input type="submit" value="Update Book">
+    </form>
+    <footer>
+        <br><a href="/books">Back to Books</a>
+    </footer>
+</body>
+</html>
