@@ -9,12 +9,13 @@ any actions performed (like adding a book). A link to navigate back to the home 
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Librarian's Page</title>
+    <title>Librarian Page</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <div class="container">
-        <h1>Librarian's Page</h1>
+        <h1>Librarian Page</h1>
+        <h2>Current books in the library:</h2>
         <ul>
             {% for book in books %}
             <li>
@@ -22,14 +23,14 @@ any actions performed (like adding a book). A link to navigate back to the home 
                 {% if book.is_borrowed %}
                     <span>This book is borrowed.</span>
                 {% else %}
-                    <a href="/edit/{{ book.title }}">Edit</a>
-                    <a href="/delete/{{ book.title }}">Delete</a>
+                    <a href="/edit/{{ book.title }}" class="edit-link">Edit</a>
+                    <a href="/delete/{{ book.title }}" class="delete-link">Delete</a>
                 {% endif %}
             </li>
             {% endfor %}
         </ul>
-        <h2>Add a New Book</h2>
 
+        <h2>Add a New Book</h2>
         <!-- Display Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
