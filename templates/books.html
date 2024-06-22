@@ -1,6 +1,6 @@
 <!--
-This file renders the list of books in the library and allows users to borrow or return books.
-If a book is borrowed, a message indicates this, and the option to return the book is provided.
+This file renders the list of books in the library and allows users to borrow books.
+If a book is borrowed, a message indicates this.
 The page also includes a link to navigate back to the home page.
 -->
 
@@ -13,14 +13,13 @@ The page also includes a link to navigate back to the home page.
 </head>
 <body>
     <div class="container">
-        <h1>Books in Your Library</h1>
+        <h1>Library Books</h1>
         <ul>
             {% for book in books %}
             <li>
                 {{ book.title }} by {{ book.author }} ({{ book.publication_year }}), Genre: {{ book.genre }}
                 {% if book.is_borrowed %}
                     <span>This book is borrowed.</span>
-                    <a href="/return/{{ book.title }}">Return</a>
                 {% else %}
                     <a href="/borrow/{{ book.title }}">Borrow</a>
                 {% endif %}
