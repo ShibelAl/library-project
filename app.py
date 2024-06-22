@@ -1,91 +1,109 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 from library import Library
 from book import Book
 
 # This Flask application serves as the foundation for the library website.
 
 app = Flask(__name__)
+app.secret_key = 'supersecretkey'  # for the flash messages
 library = Library()
+
+# Personal Library (List of borrowed books)
+personal_library = []
+
 
 @app.route('/')
 def index():
     """
-    Renders the homepage template
+    Renders the index page.
 
-    :returns:
-        The rendered HTML content for the homepage.
-
-    :raises:
-        TemplateNotFound: If the `index.html` template is not found.
+    :return: Rendered HTML of the index page.
     """
-
     return render_template('index.html')
 
 
-
-@app.route('/books', methods=['GET', 'POST'])
+@app.route('/books')
 def books():
     """
-    This function handles the display and submission of books in the library.
+    Renders the public library books page, listing all available books with options to borrow or return them.
 
-    For GET requests, this function retrieves and displays a list of books
-    from the library. If provided, it filters the books by the author, genre and the publication year.
+    :return: Rendered HTML of the public library books page.
+    """
+    listed_books = library.list_books()
+    return render_template('books.html', books=listed_books)
 
-    For POST requests, this function handles the submission of a new book
-    to the library. The new book's details are extracted from the form data
-    and added to the library.
 
-    Form Data (POST):
-        title (str): The title of the book.
-        author (str): The author of the book.
-        year (int): The publication year of the book.
-        genre (str): The genre of the book.
+@app.route('/librarians', methods=['GET', 'POST'])
+def librarians():
+    """
+    Renders the librarian's page.
+    - If GET request: Display the list of books with options to edit, delete, or add new books.
+    - If POST request: Add a new book to the library.
 
-    :returns:
-        - For GET requests: Renders the 'books.html' template with the list of books.
-        - For POST requests: Redirects to the 'books' route after adding the new book.
+    :return: Rendered HTML of the librarian's page.
     """
     if request.method == 'POST':
         data = request.form
         book = Book(data['title'], data['author'], int(data['year']), data['genre'])
         library.add_book(book)
-        return redirect(url_for('books'))
+        flash(f'Book "{book.title}" added successfully.', 'success')
+        return redirect(url_for('librarians'))
 
-    # If I want to see only the books published in the 2008
-    # I should put -> publication_year=2008  in the list_books function.
     listed_books = library.list_books()
-    return render_template('books.html', books=listed_books)
+    return render_template('manage_books.html', books=listed_books)
+
+
+@app.route('/borrow/<title>')
+def borrow_book(title):
+    """
+    Borrow a book from the public library and add it to the personal library.
+
+    :param title: Title of the book to borrow.
+    :return: Redirect to the public library books page with a success or error message.
+    """
+    success, timestamp = library.borrow_book(title)
+    if success:
+        book = next((book for book in library.books if book.title == title), None)
+        if book:
+            personal_library.append(book)
+        flash(f'Book "{title}" borrowed successfully at {timestamp}.', 'success')
+    else:
+        flash(f'Book "{title}" could not be borrowed.', 'error')
+    return redirect(url_for('books'))
+
+
+@app.route('/return/<title>')
+def return_book(title):
+    """
+    Return a borrowed book from the personal library to the public library.
+
+    :param title: Title of the book to return.
+    :return: Redirect to the public library books page with a success or error message.
+    """
+    success, timestamp = library.return_book(title)
+    if success:
+        book = next((book for book in personal_library if book.title == title), None)
+        if book:
+            personal_library.remove(book)
+        flash(f'Book "{title}" returned successfully at {timestamp}.', 'success')
+    else:
+        flash(f'Book "{title}" could not be returned.', 'error')
+    return redirect(url_for('books'))
 
 
 @app.route('/edit/<title>', methods=['GET', 'POST'])
 def edit_book(title):
     """
-    This function handles the editing of a book's details in the library.
+    Edit the details of an existing book in the library.
+    - If GET request: Display the form to edit the book details.
+    - If POST request: Update the book details in the library.
 
-    For GET requests, this function retrieves the details of the specified book
-    and displays the edit form.
-
-    For POST requests, this function handles the submission of the edited details
-    for the specified book. The new details are extracted from the form data and
-    used to update the book in the library.
-
-    Form Data (POST request):
-        new_title (str): The new title of the book.
-        author (str): The new author of the book.
-        year (int): The new publication year of the book.
-        genre (str): The new genre of the book.
-
-    :argument:
-        title (str): The title of the book to be edited.
-
-    :returns:
-        - For GET requests: Renders the 'edit_book.html' template with the book's details.
-        - For POST requests: Redirects to the 'books' route after updating the book's details.
-        - If the book is not found: Redirects to the 'books' route.
+    :param title: Title of the book to edit.
+    :return: Redirect to the librarian's page with a success or error message.
     """
     book = next((book for book in library.books if book.title == title), None)
     if not book:
-        return redirect(url_for('books'))
+        return redirect(url_for('librarians'))
 
     if request.method == 'POST':
         data = request.form
@@ -95,8 +113,11 @@ def edit_book(title):
             "publication_year": int(data.get('year')),
             "genre": data.get('genre')
         }
-        library.edit_book(title, new_details)
-        return redirect(url_for('books'))
+        if library.edit_book(title, new_details):
+            flash(f'Book "{title}" updated successfully.', 'success')
+        else:
+            flash(f'Book "{title}" could not be updated because it is currently borrowed.', 'error')
+        return redirect(url_for('librarians'))
 
     return render_template('edit_book.html', book=book)
 
@@ -104,42 +125,29 @@ def edit_book(title):
 @app.route('/delete/<title>')
 def delete_book(title):
     """
-      This function handles the deletion of a book from the library.
+    Delete a book from the library.
 
-      This function is called when a user navigates to the /delete/<title> route.
-      It deletes the specified book from the library based on its title and then
-      redirects the user to the list of books.
-
-      :argument:
-          title (str): The title of the book to be deleted.
-
-      :returns:
-          A redirect response to the 'books' route.
-      """
-    library.delete_book(title)
-    return redirect(url_for('books'))
-
-
-@app.route('/borrow/<title>')
-def borrow_book(title):
-    if library.borrow_book(title):
-        message = f'You have borrowed "{title}" successfully.'
+    :param title: Title of the book to delete.
+    :return: Redirect to the librarian's page with a success or error message.
+    """
+    book = next((book for book in library.books if book.title == title), None)
+    if book and not book.is_borrowed:
+        library.delete_book(title)
+        flash(f'Book "{title}" deleted successfully.', 'success')
     else:
-        message = f'The book "{title}" is already borrowed or not available.'
-    return redirect(url_for('books', message=message))
+        flash(f'Book "{title}" could not be deleted because it is currently borrowed.', 'error')
+    return redirect(url_for('librarians'))
 
 
-@app.route('/return/<title>')
-def return_book(title):
-    if library.return_book(title):
-        message = f'You have returned "{title}" successfully.'
-    else:
-        message = f'The book "{title}" was not borrowed or not available.'
-    return redirect(url_for('books', message=message))
+@app.route('/personal_library')
+def personal_library_view():
+    """
+    Render the personal library page, listing all borrowed books with options to return them.
 
+    :return: Rendered HTML of the personal library page.
+    """
+    return render_template('personal_library.html', books=personal_library)
 
 
 if __name__ == '__main__':
-    # This will launch the application in debug mode,
-    # allowing for automatic code reloads during development.
     app.run(debug=True)
