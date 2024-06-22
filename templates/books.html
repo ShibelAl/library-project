@@ -1,3 +1,9 @@
+<!--
+This file renders the list of books in the library and allows users to borrow or return books.
+If a book is borrowed, a message indicates this, and the option to return the book is provided.
+The page also includes a link to navigate back to the home page.
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,27 +18,15 @@
             {% for book in books %}
             <li>
                 {{ book.title }} by {{ book.author }} ({{ book.publication_year }}), Genre: {{ book.genre }}
-                <span>
-                    <a href="/edit/{{ book.title }}">Edit</a>
-                    <a href="/delete/{{ book.title }}">Delete</a>
-                    {% if book.is_borrowed %}
-                        <a href="/return/{{ book.title }}">Return</a>
-                        <span>(Borrowed)</span>
-                    {% else %}
-                        <a href="/borrow/{{ book.title }}">Borrow</a>
-                    {% endif %}
-                </span>
+                {% if book.is_borrowed %}
+                    <span>This book is borrowed.</span>
+                    <a href="/return/{{ book.title }}">Return</a>
+                {% else %}
+                    <a href="/borrow/{{ book.title }}">Borrow</a>
+                {% endif %}
             </li>
             {% endfor %}
         </ul>
-        <h2>Add a New Book</h2>
-        <form action="/books" method="post">
-            Title: <input type="text" name="title"><br>
-            Author: <input type="text" name="author"><br>
-            Year: <input type="text" name="year"><br>
-            Genre: <input type="text" name="genre"><br>
-            <input type="submit" value="Add Book">
-        </form>
         <footer>
             <a href="/">Back to Home</a>
         </footer>
