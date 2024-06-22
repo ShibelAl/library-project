@@ -88,3 +88,17 @@ li a {
 footer {
     margin-top: 20px; /*Adds a 20px margin above the footer*/
 }
+
+
+/* Success messages */
+.success {
+    background-color: #4CAF50; /* Green */
+    color: white;
+}
+
+/* Error messages */
+.error {
+    background-color: #f44336; /* Red */
+    color: white;
+}
+
