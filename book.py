@@ -4,7 +4,7 @@
 # of a book in the library management system.
 # ---------------------------
 class Book:
-    def __init__(self, title, author, publication_year, genre):
+    def __init__(self, title, author, publication_year, genre, is_borrowed=False):
         """
         Constructor method for the Book class.
 
@@ -21,6 +21,8 @@ class Book:
         self.author = author
         self.publication_year = publication_year
         self.genre = genre
+        self.is_borrowed = is_borrowed
+
 
     def update(self, title=None, author=None, publication_year=None, genre=None):
         """
@@ -62,5 +64,19 @@ class Book:
             "title": self.title,
             "author": self.author,
             "publication_year": self.publication_year,
-            "genre": self.genre
+            "genre": self.genre,
+            "is_borrowed": self.is_borrowed
         }
+
+
+    def borrow(self):
+        if not self.is_borrowed:
+            self.is_borrowed = True
+            return True
+        return False
+
+    def return_book(self):
+        if self.is_borrowed:
+            self.is_borrowed = False
+            return True
+        return False

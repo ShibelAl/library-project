@@ -83,6 +83,23 @@ class Library:
         self.books = [book for book in self.books if book.title != title]
         self.save_library()
 
+    def borrow_book(self, title):
+        for book in self.books:
+            if book.title == title:
+                if book.borrow():
+                    self.save_library()
+                    return True
+        return False
+
+    def return_book(self, title):
+        for book in self.books:
+            if book.title == title:
+                if book.return_book():
+                    self.save_library()
+                    return True
+        return False
+
+
     def save_library(self):
         """
         Saves the current state of the library (list of books) to the JSON file.

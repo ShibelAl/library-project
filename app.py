@@ -120,6 +120,25 @@ def delete_book(title):
     return redirect(url_for('books'))
 
 
+@app.route('/borrow/<title>')
+def borrow_book(title):
+    if library.borrow_book(title):
+        message = f'You have borrowed "{title}" successfully.'
+    else:
+        message = f'The book "{title}" is already borrowed or not available.'
+    return redirect(url_for('books', message=message))
+
+
+@app.route('/return/<title>')
+def return_book(title):
+    if library.return_book(title):
+        message = f'You have returned "{title}" successfully.'
+    else:
+        message = f'The book "{title}" was not borrowed or not available.'
+    return redirect(url_for('books', message=message))
+
+
+
 if __name__ == '__main__':
     # This will launch the application in debug mode,
     # allowing for automatic code reloads during development.
