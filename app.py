@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from library import Library
 from book import Book
+from datetime import datetime
 
 # This Flask application serves as the foundation for the library website.
 
@@ -43,15 +44,42 @@ def librarians():
     :return: Rendered HTML of the librarian's page.
     """
     if request.method == 'POST':
-        data = request.form
-        book = Book(data['title'], data['author'], int(data['year']), data['genre'])
-        library.add_book(book)
-        flash(f'Book "{book.title}" added successfully.', 'success')
+        try:
+            data = request.form
+            new_title = data.get('title')
+            author = data.get('author')
+            genre = data.get('genre')
+            year = data.get('year')
+
+            # Check for empty fields
+            if not new_title or not author or not genre or not year:
+                raise ValueError('Please fill in all fields.')
+
+            # Convert year to integer
+            try:
+                publication_year = int(year)
+            except ValueError:
+                raise ValueError('Invalid year format. Please enter a valid year.')
+
+            # Check if author or genre contain digits
+            if any(char.isdigit() for char in author):
+                raise ValueError('Author should not contain numbers.')
+
+            if any(char.isdigit() for char in genre):
+                raise ValueError('Genre should not contain numbers.')
+
+            # If all checks pass, add the book to the library
+            book = Book(new_title, author, publication_year, genre)
+            library.add_book(book)
+            flash(f'Book "{book.title}" added successfully.', 'success')
+
+        except ValueError as e:
+            flash(str(e), 'error')
+
         return redirect(url_for('librarians'))
 
     listed_books = library.list_books()
     return render_template('manage_books.html', books=listed_books)
-
 
 @app.route('/borrow/<title>')
 def borrow_book(title):
@@ -107,20 +135,40 @@ def edit_book(title):
 
     if request.method == 'POST':
         data = request.form
+        try:
+            new_year = int(data.get('year'))
+        except ValueError:
+            flash('Invalid year format. Please enter a valid year.', 'error')
+            return redirect(url_for('edit_book', title=title))
+
+        # Check if author or genre contain digits
+        if any(char.isdigit() for char in data.get('author', '')):
+            flash('Author should not contain numbers.', 'error')
+            return redirect(url_for('edit_book', title=title))
+
+        if any(char.isdigit() for char in data.get('genre', '')):
+            flash('Genre should not contain numbers.', 'error')
+            return redirect(url_for('edit_book', title=title))
+
         new_details = {
             "title": data.get('new_title'),
             "author": data.get('author'),
-            "publication_year": int(data.get('year')),
+            "publication_year": new_year,
             "genre": data.get('genre')
         }
+
+        if new_year > datetime.now().year:
+            flash('Publication year cannot be in the future.', 'error')
+            return redirect(url_for('edit_book', title=title))
+
         if library.edit_book(title, new_details):
             flash(f'Book "{title}" updated successfully.', 'success')
         else:
             flash(f'Book "{title}" could not be updated because it is currently borrowed.', 'error')
+
         return redirect(url_for('librarians'))
 
     return render_template('edit_book.html', book=book)
-
 
 @app.route('/delete/<title>')
 def delete_book(title):
