@@ -102,3 +102,11 @@ footer {
     color: white;
 }
 
+/* Specific styling for Edit and Delete links */
+.edit-link {
+    color: #007BFF; /* Blue color for Edit link */
+}
+
+.delete-link {
+    color: #DC3545; /* Red color for Delete link */
+}
