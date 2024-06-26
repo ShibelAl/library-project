@@ -1,0 +1,42 @@
+<!--
+This file renders the personal library page, displaying the list of books that the user has borrowed.
+Each book has an option to return it to the public library. Flash messages are displayed for any actions
+performed (like returning a book). A link to navigate back to the home page is included.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Personal Library</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Your Personal Library</h1>
+
+        <!-- Display Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul class="flashes">
+              {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
+        <ul>
+            {% for book in books %}
+            <li>
+                {{ book.title }} by {{ book.author }} ({{ book.publication_year }}), Genre: {{ book.genre }}
+                <a href="/return/{{ book.title }}">Return</a>
+            </li>
+            {% endfor %}
+        </ul>
+        <footer>
+            <a href="/">Back to Home</a>
+        </footer>
+    </div>
+</body>
+</html>
