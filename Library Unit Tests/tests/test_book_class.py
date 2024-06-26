@@ -2,7 +2,7 @@ import unittest
 from book import Book
 from library import Library
 
-class testBookClass(unittest.TestCase):
+class TestBookClass(unittest.TestCase):
 
     def test_book_init_function(self):
         book = Book("theTitle", "theAuthor", 2001, "action")
